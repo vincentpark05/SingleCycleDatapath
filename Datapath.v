@@ -150,8 +150,10 @@ module Datapath(input clock,
 	// SignExtend
 	wire[15:0] sign_extend_in;
 	wire[31:0] sign_extend_out;
-	SignExtend sign_extend(
+	wire imm_extend_control;  // New control signal (0 = sign extend, 1 = zero extend)
+    ImmExtend sign_extend(
 			sign_extend_in,
+            imm_extend_control;
 			sign_extend_out);
 	
 	// Connections for SignExtend
@@ -203,6 +205,8 @@ module Datapath(input clock,
 	wire control_unit_branch;
 	wire control_unit_mem_write;
 	wire control_unit_mem_to_reg;
+    wire control_unit_imm_extend;  // New output from ControlUnit
+
 	ControlUnit control_unit(
 			control_unit_opcode,
 			control_unit_funct,
@@ -212,7 +216,8 @@ module Datapath(input clock,
 			control_unit_alu_op,
 			control_unit_branch,
 			control_unit_mem_write,
-			control_unit_mem_to_reg);
+			control_unit_mem_to_reg,
+            control_unit_imm_extend);
 	
 	// Connections for control unit
 	assign control_unit_opcode = instruction_memory_instr[31:26];
@@ -224,6 +229,6 @@ module Datapath(input clock,
 	assign and_gate_in1 = control_unit_branch;
 	assign data_memory_write = control_unit_mem_write;
 	assign data_memory_mux_sel = control_unit_mem_to_reg;
-
+    assign imm_extend_control = control_unit_imm_extend;
 endmodule
 

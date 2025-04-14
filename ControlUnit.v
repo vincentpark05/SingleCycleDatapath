@@ -6,7 +6,8 @@ module ControlUnit(input[5:0] opcode,
 		output reg[2:0] alu_op,
 		output reg branch,
 		output reg mem_write,
-		output reg mem_to_reg);
+		output reg mem_to_reg,
+        output reg ImmExtend);
 
 	always @(opcode, funct) begin
 		
@@ -19,6 +20,7 @@ module ControlUnit(input[5:0] opcode,
 		branch = 1'bx;
 		mem_write = 1'bx;
 		mem_to_reg = 1'bx;
+        ImmExtend = 1'bx;  // <-- INITIALIZE HERE
 
 		// Check opcode
 		case (opcode)
@@ -33,6 +35,7 @@ module ControlUnit(input[5:0] opcode,
 				branch = 0;
 				mem_write = 0;
 				mem_to_reg = 0;
+                ImmExtend = 1'b0;  // <-- Not used, but set to 0 to avoid latch
 			
 				// ALU operation depends on funct
 				case (funct)
@@ -68,6 +71,32 @@ module ControlUnit(input[5:0] opcode,
 					end
 				endcase
 			end
+            
+        // andi (opcode = 0x0C)
+        6'h0C: begin
+            reg_dst = 0;
+            reg_write = 1;
+            alu_src = 1;
+            alu_op = 3'b000; // AND operation
+            branch = 0;
+            mem_write = 0;
+            mem_to_reg = 0;
+            ImmExtend = 1'b1;  // <-- ZERO EXTENSION
+            $display("\tInstruction 'andi'");
+        end
+
+        // ori (opcode = 0x0D)
+        6'h0D: begin
+            reg_dst = 0;
+            reg_write = 1;
+            alu_src = 1;
+            alu_op = 3'b001; // OR operation
+            branch = 0;
+            mem_write = 0;
+            mem_to_reg = 0;
+            ImmExtend = 1'b1;  // <-- ZERO EXTENSION
+            $display("\tInstruction 'ori'");
+        end
 
 			// lw
 			6'h23: begin
@@ -78,6 +107,7 @@ module ControlUnit(input[5:0] opcode,
 				branch = 0;
 				mem_write = 0;
 				mem_to_reg = 1;
+                ImmExtend = 1'b0;  // <-- SIGN EXTENSION
 				$display("\tInstruction 'lw'");
 			end
 
@@ -88,6 +118,7 @@ module ControlUnit(input[5:0] opcode,
 				alu_op = 3'b010;
 				branch = 0;
 				mem_write = 1;
+                ImmExtend = 1'b0;  // <-- SIGN EXTENSION
 				$display("\tInstruction 'sw'");
 			end
 
@@ -98,6 +129,7 @@ module ControlUnit(input[5:0] opcode,
 				alu_op = 3'b110;
 				branch = 1;
 				mem_write = 0;
+                ImmExtend = 1'b0;  // <-- SIGN EXTENSION
 				$display("\tInstruction 'beq'");
 			end
 		endcase

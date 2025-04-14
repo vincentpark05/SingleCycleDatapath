@@ -52,8 +52,8 @@ module Main;
 		forever #5 clock = ~clock;
 	end
 
-	// Run for 11 cycles
+	// Run for enough cycles per the instructions
 	initial begin
-		#110 $finish;
-	end
+	    #40 $finish;  // Reduced from #60 to match 3 instructions. if we're not overwriting the code in instruction memory, we just need it to be whatever the original was... plus 30 
+    end
 endmodule

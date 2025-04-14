@@ -25,6 +25,14 @@ module InstructionMemory(input clock,
 			content[8] = 32'h8d430004;	// lw $3, 4($10)
 			content[9] = 32'had430008;	// sw $3, 8($10)
 			content[10] = 32'h1000fff5;	// beq $0, $0, main
+
+
+            //ok i can't tell if we're supposed to overwrite the current code
+            //or???
+            //
+            //if we just need to overwrite we can do
+            //content[0] = whatever the hex for (andi $s0, $zero, 0x1) is
+            //do the same for the other 2 instructions           
 		end
 
 	// Read instruction
